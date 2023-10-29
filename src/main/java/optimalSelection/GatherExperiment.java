@@ -27,7 +27,7 @@ public class GatherExperiment {
 	 * 
 	 * @returns An ArrayList of all Experiment objects
 	 */
-	public static ArrayList<Experiment> getArtists(String filepath) {
+	public static ArrayList<Experiment> getExperiments(String filepath) {
 
 		ArrayList<Experiment> experiments = new ArrayList<Experiment>();
 
