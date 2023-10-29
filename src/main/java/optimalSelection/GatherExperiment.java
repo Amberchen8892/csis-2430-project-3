@@ -38,7 +38,7 @@ public class GatherExperiment {
 						Integer.parseInt(tokens[3])));
 			}
 		} catch (IOException e) {
-			System.out.println("A problem occured reading in the songs.");
+			System.out.println("A problem occured reading in the data.");
 			e.printStackTrace();
 		}
 		return experiments;
@@ -46,7 +46,7 @@ public class GatherExperiment {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(GatherExperiment.getArtists("experimentlist.csv"));
+		System.out.println(GatherExperiment.getArtists("src/main/java/optimalSelection/experimentlist.csv"));
 
 	}
 }
