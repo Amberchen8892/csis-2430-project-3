@@ -198,7 +198,7 @@ public class BruteForceSelection
 
 	public static void main(String[] args)
 	{
-		BruteForceSelection experimentPermutations = new BruteForceSelection("src/optimalSelection/experimentlist.csv");
+		BruteForceSelection experimentPermutations = new BruteForceSelection("src/main/java/optimalSelection/experimentlist.csv");
 		experimentPermutations.listExperiments();
 
 	}
