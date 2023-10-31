@@ -11,6 +11,7 @@ public class Experiment {
 	private String experiment;
 	private int weight;
 	private int rating;
+	private double ratio;
 
 	//Constructor
 	public Experiment(int number, String experiment, int weight, int rating) {
@@ -18,6 +19,7 @@ public class Experiment {
 		this.experiment = experiment;
 		this.weight = weight;
 		this.rating = rating;
+		ratio = weight / rating;
 	}
 
 	public int getNumber() {
@@ -56,6 +58,10 @@ public class Experiment {
 	public String toString() {
 		return "Experiment [number=" + number + ", experiment=" + experiment + ", weight=" + weight + ", rating="
 				+ rating + "]";
+	}
+
+	public double getRatio() {
+		return ratio;
 	}
 
 }

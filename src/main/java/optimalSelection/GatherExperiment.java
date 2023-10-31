@@ -46,7 +46,7 @@ public class GatherExperiment {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(GatherExperiment.getExperiments("experimentlist.csv"));
+		System.out.println(GatherExperiment.getExperiments("src/main/java/optimalSelection/experimentlist.csv"));
 
 	}
 }
