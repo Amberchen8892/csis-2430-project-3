@@ -38,7 +38,7 @@ public class GatherExperiment {
 						Integer.parseInt(tokens[3])));
 			}
 		} catch (IOException e) {
-			System.out.println("A problem occured reading in the songs.");
+			System.out.println("A problem occured reading in the experiments.");
 			e.printStackTrace();
 		}
 		return experiments;

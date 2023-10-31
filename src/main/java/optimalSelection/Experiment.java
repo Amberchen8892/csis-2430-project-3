@@ -19,7 +19,7 @@ public class Experiment {
 		this.experiment = experiment;
 		this.weight = weight;
 		this.rating = rating;
-		ratio = weight / rating;
+		this.ratio = (double) rating / weight;
 	}
 
 	public int getNumber() {
@@ -57,7 +57,7 @@ public class Experiment {
 	@Override
 	public String toString() {
 		return "Experiment [number=" + number + ", experiment=" + experiment + ", weight=" + weight + ", rating="
-				+ rating + "]";
+				+ rating + ", ratio=" + ratio+ "]";
 	}
 
 	public double getRatio() {
