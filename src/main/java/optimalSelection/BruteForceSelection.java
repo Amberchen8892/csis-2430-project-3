@@ -1,205 +1,191 @@
 package optimalSelection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Iterator;
 
 /**
- * 
+ * Class that takes in a list of experiment objects from a .csv file and compares all the possible sets of those experiments to determine the best rated experiment through a bruteforce technique.
  * @author Erin Mortensen
- * Class to find all the permutations possible for a list of experiments and then to see which permutation has the highest rating within a given weight limit of 700 by using a bruteforce approach.
  *
  */
 public class BruteForceSelection
 {
-
-	private ArrayList<Experiment> originalExperimentList; //list of experiments we start with
-	private ArrayList<Experiment[]> topRatedFinalists; //list of experiment permutations who potentially have the highest rating
-	private int weightLimit = 700 ; //weight limit
-	private int topRating = 0; //top rating of all experiments
-	private ArrayList<Experiment[]> topRated; //set of experiments who have the top rating
-
+	private ArrayList<Experiment> originalExperimentList; //list of experiments we start with and need to examine
+	private ArrayList<ArrayList <Experiment>> experimentsToTake; //List of experiments we should take based on their weight and that they have the highest rating
+	private int weightLimit; //weight limit
+	private int topRating; //top rating of all experiments
+	
 	/**
-	 * Initializes the array lists properties of the class.  A .csv file is used to initialize the originalExperimentList property using the GatherExperiment class.
-	 * @param fileName
+	 * Initialize the fields for the class
+	 * @param fileName Name of .csv file that has Experiment objects in it that can be read by the GatherExperiment class
 	 */
 	public BruteForceSelection(String fileName)
 	{
 		originalExperimentList = GatherExperiment.getExperiments(fileName);
-		topRatedFinalists = new ArrayList<Experiment[]>();
-
-		for (Experiment[] e : topRatedFinalists)
-		{
-			e = null;
-		}
-
-		topRated = new ArrayList<Experiment[]>();
-
+		experimentsToTake = new ArrayList<ArrayList<Experiment>>();
+		
+		weightLimit = 700;
+		topRating = 0;
 	}
-
+	
 	/**
-	 * The driver of the class.  It calls the generateAllPossibleExperiments function to get all permutations of the experiments list and then calls the getTopRated formula to determine which
-	 * permutation of the experiments is the one with the top rating.  It then prints the top rating and the array of experiments that matches this and prints them in the console.
+	 * Finds all the possible subset of experiments we are able to take and determines which of them are potentially the top rated.  Then goes through and based on the top rating found
+	 * removes any list of experiments who do not have that rating.  This allows for there to be a tie among several experiments and to keep track of those ties.  It then prints out the top
+	 * rating and the experiment subsets that have that top rating.
+	 * @return Returns ArrayList of an ArrayList of Experiments who have the top rating and should be taken on the space ship.  Allows for ties 
+	 * list of experiments
 	 */
-	public void listExperiments()
+	public ArrayList<ArrayList<Experiment>> getTopExperiment()
 	{
-
-		generateAllPossibleExperiments(0, originalExperimentList.size() - 1); // start with first element, which is 0
+		//sets the exerimentsToTake ArrayList
+		analyzePossibleExperimentLists();
 		
-		System.out.println("Top Rating " + topRating);
-		getTopRated();
-		
-		for(Experiment[] top : topRated)
+		//Go through the potential experiments to take and if they don't match the highest rating found amongst them they are removed
+		//This approach allows for us to have several sets of experiments that tie for the top rating
+		Iterator<ArrayList<Experiment>> itr = experimentsToTake.iterator();
+	    while (itr.hasNext()) 
+	    {
+	      ArrayList<Experiment> currentExperimentList = itr.next();
+	      
+	      if (determineExperimentListRatings(currentExperimentList) != topRating) 
+	      {
+	        itr.remove();
+	      }
+	      
+	    }
+	    
+	    //Print out the results
+	    System.out.println("Top Rating: " + topRating);
+	    System.out.println("List of experiments you can take to get the top rating: ");
+	    
+	    for(ArrayList<Experiment> top : experimentsToTake)
 		{
 			System.out.print("{");
-			for(Experiment t: top)
+			for(int experimentImOn = 0; experimentImOn < top.size(); experimentImOn++)
 			{
-				System.out.print(t.getExperiment() + ", ");
+				System.out.print(top.get(experimentImOn).getExperiment());
+				
+				if(experimentImOn != top.size() - 1)
+				{
+					System.out.print(", ");
+				}
+
 			}
+			
 			System.out.println("}");
 		}
 
+		
+		return experimentsToTake;
+		
+		
 	}
-
+	
 	/**
-	 * Go through the list of potential top rated experiment arrays calculates their overall rating.  It then determines if these match the topRating field.  If 
-	 * they do, and they are unique from any other array elements then they are added to the topRated ArrayList.  This is done in case there are two different arrays
-	 * with unique sets that both match the top rating
-	 * @return Returns ArrayList of Experiment arrays with the top rating 
+	 * Returns the summation of individual experiment ratings in a list 
+	 * @param myList list of experiments to get the rating for
+	 * @return Returns int representing the rating for the list of experiments
 	 */
-	public ArrayList<Experiment[]> getTopRated()
+	private int determineExperimentListRatings(ArrayList<Experiment> myList)
 	{
-		for (Experiment[] experimentList : topRatedFinalists)
+		int listRating = 0;
+		
+		for(Experiment anExperiment : myList)
 		{
-			int currentRating = 0;
-
-			for (int experiment = 0; experiment < experimentList.length; experiment++)
-			{
-				currentRating += experimentList[experiment].getRating();
-			}
-
-			//check which of the finalists matches the top rating amongst all permutations.  If there are multiple with the top include them
-			if (currentRating == topRating)
-			{
-				boolean matchesAllElements = false;
-				//check to make sure we aren't including the same list in a different order 
-				for(int e = 0; e < experimentList.length; e++)
-				{
-					for(Experiment[] t : topRated)
-					{
-						for(Experiment topExperiment : t)
-						{
-							if(experimentList[e].getNumber() == topExperiment.getNumber())
-							{
-								matchesAllElements = true;
-								break;
-							}
-						}
-						
-					}
-
-					}
-				if(!matchesAllElements) //if not same array, but with elements in different order
-				{
-					topRated.add(experimentList);
-
-				}
-			}
-
+			listRating += anExperiment.getRating();
 		}
 		
-		return topRated;
-
+		return listRating;
 	}
 
 	/**
-	 * Generate the permutations of all the possible experiments in different orders.  Once permutation is found, start from the beginning of the list of experiments and only include up to the 
-	 * element that is still within the weight limit.  Check what the rating of the experiments in the list are and if they are the same or more than the topRating for all permutations then
-	 * add them to the topRatedFinalists list.  Not all permutations can be added to a list because this takes up a lot of space on the heap, so only the top rated are included.
-	 * 
-	 * Permutations are done by working from the end of an ArrayList and swapping the elements as we work our way up
-	 * 
-	 * @param left The position in the array list we are starting at
-	 * @param right The position in the array list we are ending at
+	 * Updates the experimentsToTake ArrayList with potential top rated experiment lists.  Takes the size of the original list of experiments and determines how many 
+	 * subsets exist that represent the possible combination of experiments to include.  Creates a binary string for each of these representations and then uses them to see what subset is within
+	 * the weight limit and which has the highest rating.  It is possible for more than one subset to tie for the top rating, so this function sets the initial list of all possible subsets 
+	 * that are a finalists for the top rating, and then that list is narrowed down to the one with the top rating in the getTopExperiment function.  As the function goes through all possible subsets 
+	 * it determines what the top ranking subset is.
 	 */
-	private void generateAllPossibleExperiments(int left, int right)
+	public void analyzePossibleExperimentLists()
 	{
-		// If we have reached the end of the array (base case), add the current
-		// permutation to the list
-		if (left == right)
+		int numberOfSubSets = (int) Math.pow(2, originalExperimentList.size());
+		
+		for(int subset = 0; subset < numberOfSubSets; subset++)
 		{
-			//by using the weight limit determine how many elements in our current ArrayList are going to make it to our array
-			//use this so we can use array of a set size instead of growing an ArrayList
-			int experimentsToInclude = 0;
+			//get each subset to use to analyze the list of experiments
+			String sub = numberAsBinaryString(subset, originalExperimentList.size());
+			
 			int currentWeight = 0;
-			for (int e = 0; e < originalExperimentList.size(); e++)
-			{
-				currentWeight += originalExperimentList.get(e).getWeight();
-				if (currentWeight <= weightLimit)
-				{
-					experimentsToInclude++;
-				}
-				else
-				{
-					//everything else makes us go above the wight limit so no need to include
-					break;
-				}
-
-			}
-
-			//initialize array that we can add all the experiments to, with only the applicable experiments in it given the wight limit
-			//print these on the console
-			Experiment[] experimentSet = new Experiment[experimentsToInclude];
 			int currentRating = 0;
+			ArrayList<Experiment> currentList = new ArrayList<Experiment>();
 
-			for (int e = 0; e < experimentsToInclude; e++)
-			{
-				experimentSet[e] = originalExperimentList.get(e);
-				currentRating += experimentSet[e].getRating();
-				System.out.print(experimentSet[e].getExperiment() + ", ");
+			//if the subset is a 1 the experiment is in the list, if it is 0 it is not. Add up the weight and rating for each
+			for(int e = 0; e < originalExperimentList.size(); e++)
+			{				
+				if(sub.charAt(e) == '1')
+				{
+					Experiment includedExperiment = originalExperimentList.get(e);
+					currentWeight += includedExperiment.getWeight();
+					currentRating += includedExperiment.getRating();
+					currentList.add(includedExperiment);
+					
+				}
 			}
-			System.out.println();
-
-			//if the rating of this experiment array is equal to or greater than the current toprating add it to the list of potential top rated arrays
-			//don't want to add all arrays because this takes up a significant amount of space, but want some way we can keep track of who the top rating belongs to
-			if (currentRating >= topRating)
+			
+			//if within weight limit and better than the current rating add to finalists list
+			if((currentWeight < weightLimit) && (currentRating >= topRating))
 			{
 				topRating = currentRating;
-				topRatedFinalists.add(experimentSet);
-
-			}
-
-		}
-		else
-		{
-			// Iterate through elements in the array and swap them to generate permutations
-			for (int i = left; i <= right; i++)
-			{
-				// Swap elements at indices 'left' and 'i'
-				swap(originalExperimentList, left, i);
-				// Recursively generate permutations for the remaining elements
-				generateAllPossibleExperiments(left + 1, right);
-				// Backtrack by swapping the elements back to their original positions
-				swap(originalExperimentList, left, i);
+				experimentsToTake.add(currentList);		//will determine later if it is the top experiment		
+				
 			}
 		}
-
+		
 	}
-
-	/** 
-	 * Function to swap two Experiment elements in an ArrayList
+	
+	/**
+	 * Takes an integer and returns a bit string representation of it, of a specified length.
+	 * @param n The number you want converted into a bit string
+	 * @param size How long the bit string should be.  Helps with specifying number of preceding zeros
+	 * @throws IllegalArgumentException If size does not allow for the full bit string to be represented because it is not large enough
+	 * @return Returns bit string of the number
 	 */
-	private void swap(ArrayList<Experiment> e, int i, int j)
+	private String numberAsBinaryString(int n, int size) throws IllegalArgumentException
 	{
-		Experiment temp = e.get(i);
-		e.set(i, e.get(j));
-		e.set(j, temp);
-	}
+		String binaryString = "";
+		
+		//if the binary string can't be represented because the size specified isn't large enough throw exception
+		if(Math.pow(2,size) <= n)
+		{
+			int appropriateSize = size;
+			
+			while(Math.pow(2,appropriateSize) <= n)
+			{
+				appropriateSize++;
+			}
+			
+			String errorMessage = "Size too small.  Should be " + appropriateSize;
+			throw new IllegalArgumentException(errorMessage);
+		}
 
+		for(int i = size - 1; i >= 0; i--)
+		{
+			
+			int bin = n >> i; //shift to the right
+			bin = bin & 1;	
+			binaryString += bin;
+
+			
+		}
+		
+		return binaryString;
+	}
+	
 	public static void main(String[] args)
 	{
-		BruteForceSelection experimentPermutations = new BruteForceSelection("src/main/java/optimalSelection/experimentlist.csv");
-		experimentPermutations.listExperiments();
+		
+		BruteForceSelection bfs = new BruteForceSelection("src/main/java/optimalSelection/experimentlist.csv");
+		bfs.getTopExperiment();
+	
 
 	}
 
