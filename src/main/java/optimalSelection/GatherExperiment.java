@@ -18,6 +18,7 @@ import java.util.ArrayList;
  * @author Zach Royer
  */
 public class GatherExperiment {
+	
 	/*
 	 * Reads our .csv file path, attributes each row to an Experiment object, and
 	 * returns an ArrayList of Experiment objects
