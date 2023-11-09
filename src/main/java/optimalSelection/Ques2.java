@@ -37,7 +37,7 @@ public class Ques2{
 
 	private static void basedOnRating() {
 		ArrayList<Experiment> al = new ArrayList<Experiment>();
-		al = GatherExperiment.getArtists("src/optimalSelection/resources/experimentlist.csv");
+		al = GatherExperiment.getExperiments("src/main/java/optimalSelection/experimentlist.csv");
 		List<Experiment> selectedExperiments = new ArrayList<>();
 		int totalWeight = 0;
 		int totalRating = 0;
@@ -45,7 +45,6 @@ public class Ques2{
                 .thenComparingInt(e -> e.getWeight()).reversed());
 		
 		for (Experiment experiment : al) {
-			System.out.println(experiment);
 			if (totalWeight + experiment.getWeight() <= 700) {
 				selectedExperiments.add(experiment);
 				totalWeight += experiment.getWeight();
